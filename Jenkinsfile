@@ -7,7 +7,7 @@ pipeline {
 	  stage('building Docker Image') {
 	    steps {
 		    script {
-            sh 'docker build -t .'
+            sh 'docker build .'
             sh "docker tag materialdashboard:latest ${registryUrl}/mydemoproject/harborimg:${env.BUILD_NUMBER}"
             sh "docker rmi materialdashboard:latest"
 
