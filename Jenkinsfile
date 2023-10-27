@@ -1,28 +1,24 @@
 pipeline {
-  agent any
-  environment {
-     registryUrl ="https://7tiuxysa.c1.gra9.container-registry.ovh.net"
-     DOCKER = "DOCKER_CREDENTIALS"
-  }
-  stages{
-	  stage('building Docker Image') {
-	    steps {
-		    script {
-            sh 'docker build -t materialdashboard .'
-        }
-	    }
-	  }
-
-    stage('Upload Image to Harbor registry') {
-      steps{   
-        script {
-          // sh '''echo $DOCKER_CREDENTIALS_PSW | docker login $registryUrl -u 'DOCKER_CREDENTIALS_USER' --password-stdin'''
-          sh 'echo $DOCKER_PSW | docker login ${registryUrl} -u $DOCKER_USER --password-stdin'
-          sh "docker tag materialdashboard:latest ${registryUrl}/mydemoproject/harborimg:${env.BUILD_NUMBER}"
-          sh "docker image push ${registryUrl}/mydemoproject/harborimg:${env.BUILD_NUMBER}"
-          sh "docker rmi materialdashboard:latest"
-        }
-      }
+    agent any
+    environment {
+        DOCKER_REGISTRY_URL = 'https://7tiuxysa.c1.gra9.container-registry.ovh.net'
+        DOCKER_PROJECT_NAME = 'mydemoproject'
     }
-  }  
-}
+ 
+    stages {
+        stage('Build and Push React Image') {
+            steps {
+                dir('react') {
+                    script {
+                        echo "DOCKER_REGISTRY_URL: ${DOCKER_REGISTRY_URL}"
+                        def harborImage = "${DOCKER_PROJECT_NAME}/:${env.BUILD_ID}"
+                        docker.build(harborImage, "-f Dockerfile .")
+                        docker.withRegistry('https://7tiuxysa.c1.gra9.container-registry.ovh.net', 'ovh-registry-credentials') {
+                            docker.image(harborImage).push()
+                        }
+                    }
+                }
+            }
+        }
+    }
+}        
