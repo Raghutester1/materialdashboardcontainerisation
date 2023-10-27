@@ -7,7 +7,7 @@ pipeline {
 	  stage('building Docker Image') {
 	    steps {
 		    script {
-            sh 'docker build -t materialdashboard:latest .'
+            sh 'docker build -t materialdashboard .'
         }
 	    }
 	  }
