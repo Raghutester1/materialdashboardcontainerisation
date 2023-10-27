@@ -11,7 +11,7 @@ pipeline {
                 dir('react') {
                     script {
                         echo "DOCKER_REGISTRY_URL: ${DOCKER_REGISTRY_URL}"
-                        def harborImage = "${DOCKER_PROJECT_NAME}/:${env.BUILD_ID}"
+                        def harborImage = "${DOCKER_PROJECT_NAME}/harborimg:${env.BUILD_ID}"
                         docker.build(harborImage, "-f Dockerfile .")
                         docker.withRegistry('https://7tiuxysa.c1.gra9.container-registry.ovh.net', 'ovh-registry-credentials') {
                             docker.image(harborImage).push()
